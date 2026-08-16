@@ -9,7 +9,7 @@
 body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo);margin:0;padding:2rem 1rem;display:grid;justify-content:center;gap:1rem}
 h1{font-size:1.1rem;margin:0}
 p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
-.rm-widget{max-width:44rem}
+.rm-widget{max-width:46rem}
 </style>
 <style>
 .rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:1fr;margin-block:1rem}
@@ -40,6 +40,9 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 .rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0.06em;fill:var(--tenue)}
 @media (prefers-reduced-motion: reduce){.rm-scena .luce{transition:none}}
 .rm-fase{color:var(--accento)}
+.rm-visori{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start}
+.rm-grafici{display:grid;gap:0.3rem;align-content:start}
+#rm-loss,#rm-tracce{width:220px;height:88px;display:block;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px}
 .rm-comandi{display:grid;gap:0.6rem;align-content:start;border-top:1px solid var(--filetto);padding-top:0.6rem}
 .rm-comandi input[type="range"]{max-width:320px}
 .rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
@@ -59,7 +62,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 </style>
 <body>
 <h1>La luce delle scale, imparata da una rete</h1>
-<p class="nota">Il circuito del deviatore: la luce si accende quando le due leve scelgono lo stesso filo. Fase 1: toccate gli interruttori e cercate dove la rete - pesi a caso - sbaglia. Fase 2: &laquo;Addestra&raquo;, e guardate mappa e numeri muoversi finch&eacute; la rete non impara.</p>
+<p class="nota">Il circuito del deviatore: la luce si accende quando le due leve scelgono lo stesso filo. Fase 1: toccate gli interruttori e cercate dove la rete - pesi a caso - sbaglia. Fase 2: &laquo;Addestra&raquo;, e guardate i tre visori: la mappa, l&rsquo;errore che scende, le traiettorie dei nove numeri.</p>
 <div class="rm-widget" id="rm-widget">
 <div>
 <p class="rm-eti rm-fase">FASE 1 &middot; A MANO: FATE ESPERIENZA DELLE COMBINAZIONI</p>
@@ -111,8 +114,18 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 <button type="button" id="rm-ricomincia">Ricomincia</button>
 </div>
 <p class="rm-stato" id="rm-stato" role="status">Pesi a caso. Fase 1: toccate gli interruttori nella scena e cercate dove la rete sbaglia. Poi &laquo;Addestra&raquo;.</p>
-<p class="rm-eti">LA MAPPA SI RIDISEGNA A OGNI GIRO &middot; <span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
+<div class="rm-visori">
+<div>
+<p class="rm-eti">LA MAPPA, A OGNI GIRO &middot; <span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
 <canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due interruttori, ridisegnata a ogni giro di addestramento"></canvas>
+</div>
+<div class="rm-grafici">
+<p class="rm-eti">L'ERRORE CHE SCENDE</p>
+<canvas id="rm-loss" width="220" height="88" aria-label="la curva dell'errore medio, giro per giro"></canvas>
+<p class="rm-eti">LE TRAIETTORIE DEI NOVE NUMERI &middot; <span class="rm-chip rm-chip-no"></span> NASCOSTI &middot; <span class="rm-chip rm-chip-si"></span> USCITA</p>
+<canvas id="rm-tracce" width="220" height="88" aria-label="le traiettorie dei nove pesi e soglie durante l'addestramento"></canvas>
+</div>
+</div>
 <p class="rm-eti">I NOVE NUMERI, ADESSO</p>
 <p class="rm-stato" id="rm-numeri">&ndash;</p>
 </div>
@@ -157,10 +170,11 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 
   /* ---- la rete: 2 ingressi, 2 nascosti, 1 uscita (sempre sigmoide) ---- */
   let P = null, giri = 0, esito = "corre", tentativi = 1;
+  let storia = [];
   function ricomincia(mantieniTentativi) {
     const c = () => Math.random() * 2 - 1;
     P = { w1: [[c(), c()], [c(), c()]], s1: [c(), c()], w2: [c(), c()], s2: c() };
-    giri = 0; esito = "corre";
+    giri = 0; esito = "corre"; storia = [];
     if (!mantieniTentativi) tentativi = 1;
   }
   function inAvanti(x, y) {
@@ -196,7 +210,9 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     }
     P.s2 -= eta * gs2;
     giri++;
-    return { errore: errore / ESEMPI.length, giuste };
+    const e = errore / ESEMPI.length;
+    storia.push([e, P.w1[0][0], P.w1[0][1], -P.s1[0], P.w1[1][0], P.w1[1][1], -P.s1[1], P.w2[0], P.w2[1], -P.s2]);
+    return { errore: e, giuste };
   }
 
   /* ---- colori del tema, con ritinta al cambio ---- */
@@ -250,6 +266,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       scheda.classList.toggle("giusta", (p > 0.5) === (tv === 1));
     });
     giocata();
+    disegnaGrafici();
     const elNumeri = document.getElementById("rm-numeri");
     if (elNumeri) {
       const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "\u2212");
@@ -336,6 +353,64 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
   tasso.addEventListener("input", () => {
     tassoV.textContent = parseFloat(tasso.value).toFixed(1).replace(".", ",");
   });
+
+
+  /* ---- i grafici: l'errore che scende, le traiettorie dei nove numeri ---- */
+  const cvLoss = document.getElementById("rm-loss");
+  const cvTracce = document.getElementById("rm-tracce");
+  function campiona(larghezza) {
+    if (storia.length < 2) return null;
+    const passo = Math.max(1, Math.floor(storia.length / larghezza));
+    const punti = [];
+    for (let i = 0; i < storia.length; i += passo) punti.push(storia[i]);
+    if (punti[punti.length - 1] !== storia[storia.length - 1]) punti.push(storia[storia.length - 1]);
+    return punti;
+  }
+  function disegnaGrafici() {
+    if (!cvLoss || !cvTracce) return;
+    const t = tinteCorrenti();
+    const rgb = (c) => "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+    const L = cvLoss.width, A = cvLoss.height;
+    const gl = cvLoss.getContext("2d");
+    const gt = cvTracce.getContext("2d");
+    gl.clearRect(0, 0, L, A); gt.clearRect(0, 0, L, A);
+    const punti = campiona(L);
+    if (!punti) return;
+    // l'errore: da 0 (in basso) al massimo visto
+    let maxE = 0.55;
+    for (const r of punti) if (r[0] > maxE) maxE = r[0];
+    gl.strokeStyle = rgb(t.si); gl.lineWidth = 2; gl.beginPath();
+    punti.forEach((r, i) => {
+      const x = i / (punti.length - 1) * (L - 8) + 4;
+      const y = A - 6 - (r[0] / maxE) * (A - 12);
+      if (i === 0) gl.moveTo(x, y); else gl.lineTo(x, y);
+    });
+    gl.stroke();
+    // le traiettorie: sei numeri nascosti (secondario), tre d'uscita (accento)
+    let mn = Infinity, mx = -Infinity;
+    for (const r of punti) for (let k = 1; k <= 9; k++) {
+      if (r[k] < mn) mn = r[k];
+      if (r[k] > mx) mx = r[k];
+    }
+    const ampiezza = (mx - mn) || 1;
+    // la linea dello zero, per orientarsi
+    if (mn < 0 && mx > 0) {
+      const y0 = A - 6 - ((0 - mn) / ampiezza) * (A - 12);
+      gt.strokeStyle = rgb(t.punto); gt.globalAlpha = 0.25; gt.lineWidth = 1;
+      gt.beginPath(); gt.moveTo(4, y0); gt.lineTo(L - 4, y0); gt.stroke();
+      gt.globalAlpha = 1;
+    }
+    for (let k = 1; k <= 9; k++) {
+      gt.strokeStyle = rgb(k <= 6 ? t.no : t.si);
+      gt.lineWidth = 1.2; gt.beginPath();
+      punti.forEach((r, i) => {
+        const x = i / (punti.length - 1) * (L - 8) + 4;
+        const y = A - 6 - ((r[k] - mn) / ampiezza) * (A - 12);
+        if (i === 0) gt.moveTo(x, y); else gt.lineTo(x, y);
+      });
+      gt.stroke();
+    }
+  }
 
   /* ---- il gioco: la scena unica, gli interruttori, il verdetto ---- */
   const scena = document.getElementById("rm-scena");
