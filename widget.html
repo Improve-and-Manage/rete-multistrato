@@ -2,7 +2,7 @@
 <html lang="it">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La rete che impara XOR davanti a voi</title>
+<title>La luce delle scale, imparata da una rete</title>
 <style>
 :root{color-scheme:light dark;
   --sfondo:#fbfaf7;--rialzo:#f4f2ec;--testo:#16161a;--tenue:#6b6b76;
@@ -15,12 +15,20 @@ body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo
 h1{font-size:1.1rem;margin:0}
 p.nota{color:var(--tenue);font-size:0.85rem;max-width:36rem;margin:0}
 .rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);
-  padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:auto 1fr;align-items:start;max-width:40rem}
-@media (max-width:40em){.rm-widget{grid-template-columns:1fr}}
+  padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:auto 1fr;align-items:start;max-width:42rem}
+@media (max-width:42em){.rm-widget{grid-template-columns:1fr}}
 .rm-eti{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;
   color:var(--tenue);text-transform:uppercase;margin:0 0 0.4rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
 #rm-tela{width:224px;height:224px;max-width:100%;image-rendering:pixelated;background:var(--sfondo);
   border:1px solid var(--filetto);border-radius:6px;display:block}
+.rm-casi{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;max-width:280px;margin-bottom:0.6rem}
+.rm-caso{display:grid;justify-items:center;gap:4px;padding:0.3rem;background:var(--sfondo);
+  border:1px solid var(--filetto);border-radius:6px;font-family:ui-monospace,monospace;
+  font-size:0.7rem;color:var(--tenue)}
+.rm-caso.giusta{border-color:var(--accento)}
+.rm-lampada{width:1.2em;height:1.2em;border-radius:50%;border:1px solid var(--filetto)}
+.rm-lampada.accesa{background:var(--accento);border-color:var(--accento)}
+.rm-deve{font-size:0.85em}
 .rm-comandi{display:grid;gap:0.6rem;align-content:start;min-width:16rem}
 .rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
 .rm-valore{color:var(--testo)}
@@ -39,16 +47,22 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:36rem;margin:0}
 .rm-tinta-testo{color:var(--testo)}
 </style>
 <body>
-<h1>La rete che impara XOR davanti a voi</h1>
-<p class="nota">La rete 2-2-1 dell'articolo parte da pesi a caso e scende il gradiente.
-Scegliete la curva dello strato nascosto e il tasso di apprendimento; quando la discesa
-si incaglia, «Ricomincia» rimescola i pesi.</p>
+<h1>La luce delle scale, imparata da una rete</h1>
+<p class="nota">Due deviatori, la luce accesa quando uno solo dei due &egrave; alzato:
+&egrave; il problema XOR. La rete 2-2-1 dell'articolo parte da pesi a caso e impara la
+regola con la retropropagazione; scegliete la curva dello strato nascosto e il tasso di
+apprendimento. Se la discesa si incaglia, i pesi si rimescolano da soli.</p>
 <div class="rm-widget" id="rm-widget">
 <div>
-<p class="rm-eti">LA RISPOSTA DELLA RETE, PUNTO PER PUNTO</p>
-<canvas id="rm-tela" aria-label="la risposta della rete su tutto il quadrato degli ingressi, coi quattro punti XOR"></canvas>
-<p class="rm-eti"><span class="rm-chip rm-chip-si"></span> LA RETE DICE 1 &middot; <span class="rm-chip rm-chip-no"></span> DICE 0</p>
-<p class="rm-eti">I PUNTI PIENI VOGLIONO 1, I VUOTI 0: VINCE QUANDO OGNUNO STA NEL SUO COLORE</p>
+<p class="rm-eti">I DEVIATORI E LA LAMPADINA SECONDO LA RETE</p>
+<div class="rm-casi" aria-label="le quattro combinazioni dei deviatori con la risposta della rete">
+<div class="rm-caso" data-caso="0"><span class="rm-devi">&dArr; &dArr;</span><span class="rm-lampada" aria-hidden="true"></span><span class="rm-deve">va spenta</span></div>
+<div class="rm-caso" data-caso="1"><span class="rm-devi">&dArr; &uArr;</span><span class="rm-lampada" aria-hidden="true"></span><span class="rm-deve">va accesa</span></div>
+<div class="rm-caso" data-caso="2"><span class="rm-devi">&uArr; &dArr;</span><span class="rm-lampada" aria-hidden="true"></span><span class="rm-deve">va accesa</span></div>
+<div class="rm-caso" data-caso="3"><span class="rm-devi">&uArr; &uArr;</span><span class="rm-lampada" aria-hidden="true"></span><span class="rm-deve">va spenta</span></div>
+</div>
+<p class="rm-eti">LA MAPPA DI TUTTE LE POSIZIONI &middot; <span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
+<canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due deviatori, con le quattro combinazioni agli angoli"></canvas>
 </div>
 <div class="rm-comandi">
 <p class="rm-eti">LA CURVA DELLO STRATO NASCOSTO
@@ -59,13 +73,13 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
 </span></p>
 <label class="rm-eti" for="rm-tasso">TASSO DI APPRENDIMENTO <span id="rm-tasso-v">2,0</span></label>
 <input type="range" id="rm-tasso" min="0.2" max="8" step="0.2" value="2" />
-<p class="rm-eti">GIRI <span class="rm-valore" id="rm-giri">0</span> &middot; ERRORE MEDIO <span class="rm-valore" id="rm-errore">&ndash;</span></p>
+<p class="rm-eti">GIRI <span class="rm-valore" id="rm-giri">0</span> &middot; LAMPADINE GIUSTE <span class="rm-valore" id="rm-giuste">&ndash;</span> &middot; ERRORE <span class="rm-valore" id="rm-errore">&ndash;</span></p>
 <div class="rm-bottoni">
 <button type="button" id="rm-addestra">Addestra</button>
 <button type="button" id="rm-passo">Un passo</button>
 <button type="button" id="rm-ricomincia">Ricomincia</button>
 </div>
-<p class="rm-stato" id="rm-stato" role="status">Pesi a caso, nove parametri. Premete «Addestra».</p>
+<p class="rm-stato" id="rm-stato" role="status">Pesi a caso, nove parametri. Obiettivo: quattro lampadine giuste.</p>
 </div>
 </div>
 <script>
@@ -83,6 +97,8 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
   const elGiri = document.getElementById("rm-giri");
   const elErrore = document.getElementById("rm-errore");
   const bottoni = [...radice.querySelectorAll(".rm-att")];
+  const elGiuste = document.getElementById("rm-giuste");
+  const casi = [...radice.querySelectorAll(".rm-caso")];
   const tasso = document.getElementById("rm-tasso");
   const tassoV = document.getElementById("rm-tasso-v");
   const G = 56;                      // celle della superficie
@@ -185,7 +201,15 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
       }
     }
     g.putImageData(img, 0, 0);
-    // i quattro punti: pieni = risposta 1, vuoti = risposta 0
+    // le quattro lampadine: accesa se la rete direbbe 1; bordo acceso se giusta
+    ESEMPI.forEach(([x, y, tv], i) => {
+      const { p } = inAvanti(x, y);
+      const scheda = casi[i];
+      if (!scheda) return;
+      scheda.querySelector(".rm-lampada").classList.toggle("accesa", p > 0.5);
+      scheda.classList.toggle("giusta", (p > 0.5) === (tv === 1));
+    });
+    // i quattro punti sulla mappa: pieni = va accesa, vuoti = va spenta
     for (const [x, y, tv] of ESEMPI) {
       const px = (x - MIN) / LARG * (G - 1);
       const py = (1 - (y - MIN) / LARG) * (G - 1);
@@ -201,12 +225,13 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
   let corsa = null;
   function aggiorna(errore, giuste) {
     elGiri.textContent = giri;
+    elGiuste.textContent = giuste + "/4";
     elErrore.textContent = errore.toFixed(3).replace(".", ",");
     if (giuste === 4 && errore < 0.05 && esito === "corre") {
       esito = "imparato";
-      stato.textContent = "XOR imparato in " + giri + " giri" +
+      stato.textContent = "La luce delle scale è imparata in " + giri + " giri" +
         (tentativi > 1 ? ", al tentativo " + tentativi : "") +
-        ": ogni punto è nel suo colore.";
+        ": quattro lampadine giuste.";
       ferma();
     } else if (giri >= 4000 && esito === "corre") {
       // la discesa si e' incagliata: pesi rimescolati da soli, si riparte
@@ -243,8 +268,8 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
   });
   document.getElementById("rm-ricomincia").addEventListener("click", () => {
     ferma(); ricomincia(); disegna();
-    elGiri.textContent = 0; elErrore.textContent = "–";
-    stato.textContent = "Pesi nuovi, a caso. Obiettivo: ogni punto nel suo colore.";
+    elGiri.textContent = 0; elErrore.textContent = "–"; elGiuste.textContent = "–";
+    stato.textContent = "Pesi nuovi, a caso. Obiettivo: quattro lampadine giuste.";
   });
   for (const b of bottoni) {
     b.addEventListener("click", () => {
@@ -253,7 +278,7 @@ si incaglia, «Ricomincia» rimescola i pesi.</p>
       b.setAttribute("aria-pressed", "true");
       curva = b.dataset.curva;
       ferma(); ricomincia(); disegna();
-      elGiri.textContent = 0; elErrore.textContent = "–";
+      elGiri.textContent = 0; elErrore.textContent = "–"; elGiuste.textContent = "–";
       stato.textContent = "Curva " + b.textContent + ", pesi nuovi. Premete «Addestra».";
     });
   }
