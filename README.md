@@ -43,10 +43,6 @@ cifre diventano separabili. L'addestramento in Python puro richiede qualche
 minuto per giro: la lentezza è il prezzo della leggibilità, e il motivo per
 cui il mestiere usa acceleratori di calcolo.
 
-## Licenza
-
-[MIT](LICENSE).
-
 ## Il widget: la rete che impara davanti a voi
 
 **`widget.html`** è il widget pubblicato nell'articolo: la rete 2-2-1 parte da
@@ -62,3 +58,7 @@ $ python3 -m http.server
 ```
 
 e poi aprite <http://localhost:8000/widget.html>.
+
+## Licenza
+
+[MIT](LICENSE).
