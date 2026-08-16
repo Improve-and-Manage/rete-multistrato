@@ -8,38 +8,40 @@
 @media (prefers-color-scheme:dark){:root{--sfondo:#16161a;--rialzo:#24242a;--testo:#e8e6e1;--tenue:#a3a3ad;--filetto:#757581;--accento:#e0713f;--secondario:#5fb0a8}}
 body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo);margin:0;padding:2rem 1rem;display:grid;justify-content:center;gap:1rem}
 h1{font-size:1.1rem;margin:0}
-p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
+p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
+.rm-widget{max-width:44rem}
 </style>
 <style>
-.rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:auto 1fr;align-items:start;margin-block:1rem}
-@media (max-width:48em){.rm-widget{grid-template-columns:1fr}}
+.rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:1fr;margin-block:1rem}
 .rm-eti{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--tenue);text-transform:uppercase;margin:0 0 0.3rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
 #rm-tela{width:224px;height:224px;max-width:100%;image-rendering:pixelated;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;display:block}
-.rm-scena{width:min(100%,320px);height:auto;display:block;margin-bottom:0.3rem}
-.rm-scena .sfondo{fill:var(--sfondo);stroke:var(--filetto)}
-.rm-scena .tratto{stroke:var(--filetto);fill:none}
-.rm-scena .filo{stroke:var(--filetto);fill:none}
-.rm-scena .piastra{fill:var(--sfondo);stroke:var(--filetto)}
-.rm-scena .leva{stroke:var(--filetto);stroke-width:2.5}
-.rm-scena .leva.su{display:none;stroke:var(--accento)}
-.rm-scena.dev-a-su .int-a .leva.su{display:inline}
-.rm-scena.dev-a-su .int-a .leva.giu{display:none}
-.rm-scena.dev-b-su .int-b .leva.su{display:inline}
-.rm-scena.dev-b-su .int-b .leva.giu{display:none}
+.rm-scena{width:min(100%,480px);height:auto;display:block;margin-bottom:0.3rem;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px}
+.rm-scena .filo{stroke:var(--filetto);fill:none;stroke-width:1.5}
+.rm-scena .contatto{fill:var(--filetto)}
+.rm-scena .percorso{stroke:var(--accento);stroke-width:2.5;fill:none;display:none}
+.rm-scena.chiuso-alto .percorso-alto{display:inline}
+.rm-scena.chiuso-basso .percorso-basso{display:inline}
+.rm-scena .leva{stroke:var(--testo);stroke-width:2.5;stroke-linecap:round;display:none}
+.rm-scena:not(.pos-a-1) .leva-a-basso{display:inline}
+.rm-scena.pos-a-1 .leva-a-alto{display:inline}
+.rm-scena:not(.pos-b-1) .leva-b-alto{display:inline}
+.rm-scena.pos-b-1 .leva-b-basso{display:inline}
+.rm-scena .tocco{fill:transparent}
 .rm-scena .interruttore{cursor:pointer}
-.rm-scena .interruttore:hover .piastra, .rm-scena .interruttore:focus-visible .piastra{stroke:var(--accento)}
-.rm-scena .bulbo{fill:none;stroke:var(--filetto)}
-.rm-scena .bulbo-rete{stroke-dasharray:3 2}
-.rm-scena .luce{fill:var(--accento);opacity:0;transition:opacity 150ms ease}
-.rm-scena.accesa-vera .luce{opacity:0.18}
-.rm-scena.accesa-vera .bulbo-vera{fill:var(--accento);stroke:var(--accento)}
-.rm-scena.accesa-rete .bulbo-rete{fill:var(--accento)}
-.rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:7px;letter-spacing:0.05em;fill:var(--tenue)}
-.rm-lampa-piena{display:inline-block;width:0.7em;height:0.7em;border-radius:50%;background:var(--accento)}
-.rm-lampa-tratt{display:inline-block;width:0.7em;height:0.7em;border-radius:50%;border:1px dashed var(--accento)}
+.rm-scena .interruttore:hover .leva, .rm-scena .interruttore:focus-visible .leva{stroke:var(--accento)}
+.rm-scena .lampada{fill:none;stroke:var(--filetto);stroke-width:1.5}
+.rm-scena .croce{stroke:var(--filetto);fill:none}
+.rm-scena .alone{fill:var(--accento);opacity:0;transition:opacity 150ms ease}
+.rm-scena.vera-accesa .alone{opacity:0.22}
+.rm-scena.vera-accesa .lampada-vera{fill:var(--accento);stroke:var(--accento)}
+.rm-scena.vera-accesa .croce{stroke:var(--sfondo)}
+.rm-scena .lampada-rete{stroke-dasharray:3 2}
+.rm-scena.rete-accesa .lampada-rete{fill:var(--accento)}
+.rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0.06em;fill:var(--tenue)}
 @media (prefers-reduced-motion: reduce){.rm-scena .luce{transition:none}}
 .rm-fase{color:var(--accento)}
-.rm-comandi{display:grid;gap:0.6rem;align-content:start}
+.rm-comandi{display:grid;gap:0.6rem;align-content:start;border-top:1px solid var(--filetto);padding-top:0.6rem}
+.rm-comandi input[type="range"]{max-width:320px}
 .rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
 .rm-valore{color:var(--testo)}
 .rm-bottoni{display:flex;gap:0.6rem;flex-wrap:wrap}
@@ -57,24 +59,38 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
 </style>
 <body>
 <h1>La luce delle scale, imparata da una rete</h1>
-<p class="nota">Due interruttori, la luce accesa quando uno solo dei due &egrave; alzato: &egrave; il problema XOR. Fase 1: toccate gli interruttori nella scena e cercate dove la rete - pesi a caso - sbaglia. Fase 2: &laquo;Addestra&raquo;, e guardate mappa e numeri muoversi finch&eacute; la rete non impara.</p>
+<p class="nota">Il circuito del deviatore: la luce si accende quando le due leve scelgono lo stesso filo. Fase 1: toccate gli interruttori e cercate dove la rete - pesi a caso - sbaglia. Fase 2: &laquo;Addestra&raquo;, e guardate mappa e numeri muoversi finch&eacute; la rete non impara.</p>
 <div class="rm-widget" id="rm-widget">
 <div>
 <p class="rm-eti rm-fase">FASE 1 &middot; A MANO: FATE ESPERIENZA DELLE COMBINAZIONI</p>
 <p class="rm-eti">TOCCATE GLI INTERRUTTORI, IN BASSO E IN CIMA ALLE SCALE</p>
-<svg viewBox="0 0 240 124" class="rm-scena" id="rm-scena" role="img" aria-label="la casa con le scale: due interruttori, la lampadina vera e, accanto, la previsione della rete">
-<rect x="1" y="1" width="238" height="122" rx="4" class="sfondo"/>
-<polygon class="luce" points="108,42 68,108 148,108"/>
-<path d="M 14 78 V 8 H 108 V 26 M 214 12 V 8 H 132 V 26" class="filo"/>
-<circle cx="108" cy="33" r="7" class="bulbo bulbo-vera"/>
-<circle cx="132" cy="33" r="7" class="bulbo bulbo-rete"/>
-<text x="103" y="56" class="eti-svg" text-anchor="end">VERA</text>
-<text x="137" y="56" class="eti-svg" text-anchor="start">RETE</text>
-<path d="M 24 108 H 48 V 94 H 72 V 80 H 96 V 66 H 120 V 52 H 144 V 38 H 220" class="tratto"/>
-<g class="interruttore int-a" role="button" tabindex="0" aria-label="interruttore in basso alle scale"><rect x="6" y="78" width="16" height="22" rx="2" class="piastra"/><line x1="14" y1="89" x2="14" y2="98" class="leva giu"/><line x1="14" y1="89" x2="14" y2="80" class="leva su"/></g>
-<g class="interruttore int-b" role="button" tabindex="0" aria-label="interruttore in cima alle scale"><rect x="206" y="12" width="16" height="22" rx="2" class="piastra"/><line x1="214" y1="23" x2="214" y2="31" class="leva giu"/><line x1="214" y1="23" x2="214" y2="15" class="leva su"/></g>
+<svg viewBox="0 0 480 176" class="rm-scena" id="rm-scena" role="img" aria-label="il circuito della luce delle scale: due deviatori, due fili paralleli, la lampadina vera e sotto la previsione della rete">
+<path d="M 16 88 H 92 M 148 64 H 332 M 148 112 H 332 M 388 88 H 414 M 442 88 H 464" class="filo"/>
+<path d="M 16 88 H 96 L 144 64 H 336 L 384 88 H 414 M 442 88 H 464" class="percorso percorso-alto"/>
+<path d="M 16 88 H 96 L 144 112 H 336 L 384 88 H 414 M 442 88 H 464" class="percorso percorso-basso"/>
+<circle cx="144" cy="64" r="3" class="contatto"/><circle cx="144" cy="112" r="3" class="contatto"/>
+<circle cx="336" cy="64" r="3" class="contatto"/><circle cx="336" cy="112" r="3" class="contatto"/>
+<circle cx="96" cy="88" r="3.5" class="contatto"/><circle cx="384" cy="88" r="3.5" class="contatto"/>
+<circle cx="428" cy="88" r="20" class="alone"/>
+<circle cx="428" cy="88" r="12" class="lampada lampada-vera"/>
+<path d="M 421 81 L 435 95 M 435 81 L 421 95" class="croce"/>
+<text x="428" y="56" class="eti-svg" text-anchor="middle">LA LUCE VERA</text>
+<circle cx="428" cy="146" r="10" class="lampada lampada-rete"/>
+<text x="412" y="150" class="eti-svg" text-anchor="end">SECONDO LA RETE</text>
+<g class="interruttore int-a" role="button" tabindex="0" aria-label="il deviatore in basso alle scale">
+<rect x="56" y="48" width="96" height="88" class="tocco"/>
+<line x1="96" y1="88" x2="142" y2="66" class="leva leva-a-alto"/>
+<line x1="96" y1="88" x2="142" y2="110" class="leva leva-a-basso"/>
+<text x="96" y="40" class="eti-svg" text-anchor="middle">IN BASSO</text>
+</g>
+<g class="interruttore int-b" role="button" tabindex="0" aria-label="il deviatore in cima alle scale">
+<rect x="328" y="48" width="96" height="88" class="tocco"/>
+<line x1="384" y1="88" x2="338" y2="66" class="leva leva-b-alto"/>
+<line x1="384" y1="88" x2="338" y2="110" class="leva leva-b-basso"/>
+<text x="384" y="40" class="eti-svg" text-anchor="middle">IN CIMA</text>
+</g>
 </svg>
-<p class="rm-eti"><span class="rm-lampa-piena" aria-hidden="true"></span> PIENA: LA LUCE VERA &middot; <span class="rm-lampa-tratt" aria-hidden="true"></span> TRATTEGGIATA: SECONDO LA RETE</p>
+<p class="rm-eti">IL CIRCUITO SI CHIUDE - E LA LUCE SI ACCENDE - QUANDO LE DUE LEVE SCELGONO LO STESSO FILO</p>
 <p class="rm-stato" id="rm-verdetto" role="status">&hellip;</p>
 
 </div>
@@ -327,10 +343,12 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
     if (!scena || !verdetto) return;
     const vera = posA ^ posB;
     const rete = inAvanti(posA, posB).p > 0.5 ? 1 : 0;
-    scena.classList.toggle("dev-a-su", posA === 1);
-    scena.classList.toggle("dev-b-su", posB === 1);
-    scena.classList.toggle("accesa-vera", vera === 1);
-    scena.classList.toggle("accesa-rete", rete === 1);
+    scena.classList.toggle("pos-a-1", posA === 1);
+    scena.classList.toggle("pos-b-1", posB === 1);
+    scena.classList.toggle("chiuso-alto", posA === 1 && posB === 0);
+    scena.classList.toggle("chiuso-basso", posA === 0 && posB === 1);
+    scena.classList.toggle("vera-accesa", vera === 1);
+    scena.classList.toggle("rete-accesa", rete === 1);
     verdetto.textContent = vera === rete
       ? "Le due lampadine concordano: qui la rete ci prende."
       : "Trovata! La luce vera \u00e8 " + (vera ? "accesa" : "spenta") +
