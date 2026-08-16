@@ -4,14 +4,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>La luce delle scale, imparata da una rete</title>
 <style>
-:root{color-scheme:light dark;
-  --sfondo:#fbfaf7;--rialzo:#f4f2ec;--testo:#16161a;--tenue:#6b6b76;
-  --filetto:#918a78;--accento:#a6431e;--secondario:#1c6b66}
-@media (prefers-color-scheme:dark){:root{
-  --sfondo:#16161a;--rialzo:#24242a;--testo:#e8e6e1;--tenue:#a3a3ad;
-  --filetto:#757581;--accento:#e0713f;--secondario:#5fb0a8}}
-body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo);
-  margin:0;padding:2rem 1rem;display:grid;justify-content:center;gap:1rem}
+:root{color-scheme:light dark;--sfondo:#fbfaf7;--rialzo:#f4f2ec;--testo:#16161a;--tenue:#6b6b76;--filetto:#918a78;--accento:#a6431e;--secondario:#1c6b66}
+@media (prefers-color-scheme:dark){:root{--sfondo:#16161a;--rialzo:#24242a;--testo:#e8e6e1;--tenue:#a3a3ad;--filetto:#757581;--accento:#e0713f;--secondario:#5fb0a8}}
+body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo);margin:0;padding:2rem 1rem;display:grid;justify-content:center;gap:1rem}
 h1{font-size:1.1rem;margin:0}
 p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
 </style>
@@ -20,31 +15,30 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
 @media (max-width:48em){.rm-widget{grid-template-columns:1fr}}
 .rm-eti{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--tenue);text-transform:uppercase;margin:0 0 0.3rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
 #rm-tela{width:224px;height:224px;max-width:100%;image-rendering:pixelated;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;display:block}
-.rm-devi-grandi{display:flex;gap:1rem;margin-bottom:0.6rem}
-.rm-dev{font-family:ui-monospace,monospace;font-size:1.5em;line-height:1;color:var(--testo);background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;padding:0.6rem 1rem;cursor:pointer}
-.rm-dev:hover{border-color:var(--accento)}
-.rm-dev.su{color:var(--accento);border-color:var(--accento)}
-.rm-lampade{display:flex;gap:1rem;margin-bottom:0.6rem}
-.rm-lamp-blocco{display:grid;justify-items:center;gap:0.3rem}
-.rm-scena{width:132px;height:auto;display:block}
+.rm-scena{width:min(100%,320px);height:auto;display:block;margin-bottom:0.3rem}
 .rm-scena .sfondo{fill:var(--sfondo);stroke:var(--filetto)}
 .rm-scena .tratto{stroke:var(--filetto);fill:none}
 .rm-scena .filo{stroke:var(--filetto);fill:none}
 .rm-scena .piastra{fill:var(--sfondo);stroke:var(--filetto)}
-.rm-scena .leva{stroke:var(--filetto);stroke-width:2}
+.rm-scena .leva{stroke:var(--filetto);stroke-width:2.5}
 .rm-scena .leva.su{display:none;stroke:var(--accento)}
 .rm-scena.dev-a-su .int-a .leva.su{display:inline}
 .rm-scena.dev-a-su .int-a .leva.giu{display:none}
 .rm-scena.dev-b-su .int-b .leva.su{display:inline}
 .rm-scena.dev-b-su .int-b .leva.giu{display:none}
+.rm-scena .interruttore{cursor:pointer}
+.rm-scena .interruttore:hover .piastra, .rm-scena .interruttore:focus-visible .piastra{stroke:var(--accento)}
 .rm-scena .bulbo{fill:none;stroke:var(--filetto)}
+.rm-scena .bulbo-rete{stroke-dasharray:3 2}
 .rm-scena .luce{fill:var(--accento);opacity:0;transition:opacity 150ms ease}
-.rm-scena.accesa .luce{opacity:0.18}
-.rm-scena.accesa .bulbo{fill:var(--accento);stroke:var(--accento)}
+.rm-scena.accesa-vera .luce{opacity:0.18}
+.rm-scena.accesa-vera .bulbo-vera{fill:var(--accento);stroke:var(--accento)}
+.rm-scena.accesa-rete .bulbo-rete{fill:var(--accento)}
+.rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:7px;letter-spacing:0.05em;fill:var(--tenue)}
+.rm-lampa-piena{display:inline-block;width:0.7em;height:0.7em;border-radius:50%;background:var(--accento)}
+.rm-lampa-tratt{display:inline-block;width:0.7em;height:0.7em;border-radius:50%;border:1px dashed var(--accento)}
 @media (prefers-reduced-motion: reduce){.rm-scena .luce{transition:none}}
-.rm-mappa{border-top:1px solid var(--filetto);padding-top:0.6rem;max-width:280px}
-.rm-mappa summary{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accento);cursor:pointer;margin-bottom:0.3rem}
-.rm-mappa summary:hover{color:var(--testo)}
+.rm-fase{color:var(--accento)}
 .rm-comandi{display:grid;gap:0.6rem;align-content:start}
 .rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
 .rm-valore{color:var(--testo)}
@@ -63,51 +57,29 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:38rem;margin:0}
 </style>
 <body>
 <h1>La luce delle scale, imparata da una rete</h1>
-<p class="nota">Due deviatori, la luce accesa quando uno solo dei due &egrave; alzato: &egrave;
-il problema XOR. Muovete i deviatori e cercate la combinazione dove la rete - pesi a caso -
-sbaglia; poi &laquo;Addestra&raquo; e provate a coglierla in fallo. Se la discesa si incaglia,
-i pesi si rimescolano da soli.</p>
+<p class="nota">Due interruttori, la luce accesa quando uno solo dei due &egrave; alzato: &egrave; il problema XOR. Fase 1: toccate gli interruttori nella scena e cercate dove la rete - pesi a caso - sbaglia. Fase 2: &laquo;Addestra&raquo;, e guardate mappa e numeri muoversi finch&eacute; la rete non impara.</p>
 <div class="rm-widget" id="rm-widget">
 <div>
-<p class="rm-eti">MUOVETE I DEVIATORI: IN BASSO E IN CIMA ALLE SCALE</p>
-<div class="rm-devi-grandi">
-<button type="button" class="rm-dev" id="rm-dev-a" aria-pressed="false"><span aria-hidden="true">&dArr;</span> in basso</button>
-<button type="button" class="rm-dev" id="rm-dev-b" aria-pressed="false"><span aria-hidden="true">&dArr;</span> in cima</button>
-</div>
-<div class="rm-lampade">
-<div class="rm-lamp-blocco">
-<svg viewBox="0 0 150 104" class="rm-scena" id="rm-scena-vera" aria-hidden="true">
-<rect x="1" y="1" width="148" height="102" rx="4" class="sfondo"/>
-<polygon class="luce" points="75,34 40,92 110,92"/>
-<path d="M 11 70 V 8 H 75 M 139 26 V 8 H 75 M 75 8 V 28" class="filo"/>
-<circle cx="75" cy="34" r="6" class="bulbo"/>
-<path d="M 18 92 H 36 V 80 H 54 V 68 H 72 V 56 H 90 V 44 H 108" class="tratto"/>
-<g class="interruttore int-a"><rect x="6" y="70" width="10" height="14" rx="2" class="piastra"/><line x1="11" y1="77" x2="11" y2="84" class="leva giu"/><line x1="11" y1="77" x2="11" y2="70" class="leva su"/></g>
-<g class="interruttore int-b"><rect x="134" y="26" width="10" height="14" rx="2" class="piastra"/><line x1="139" y1="33" x2="139" y2="40" class="leva giu"/><line x1="139" y1="33" x2="139" y2="26" class="leva su"/></g>
+<p class="rm-eti rm-fase">FASE 1 &middot; A MANO: FATE ESPERIENZA DELLE COMBINAZIONI</p>
+<p class="rm-eti">TOCCATE GLI INTERRUTTORI, IN BASSO E IN CIMA ALLE SCALE</p>
+<svg viewBox="0 0 240 124" class="rm-scena" id="rm-scena" role="img" aria-label="la casa con le scale: due interruttori, la lampadina vera e, accanto, la previsione della rete">
+<rect x="1" y="1" width="238" height="122" rx="4" class="sfondo"/>
+<polygon class="luce" points="108,42 68,108 148,108"/>
+<path d="M 14 78 V 8 H 108 V 26 M 214 12 V 8 H 132 V 26" class="filo"/>
+<circle cx="108" cy="33" r="7" class="bulbo bulbo-vera"/>
+<circle cx="132" cy="33" r="7" class="bulbo bulbo-rete"/>
+<text x="103" y="56" class="eti-svg" text-anchor="end">VERA</text>
+<text x="137" y="56" class="eti-svg" text-anchor="start">RETE</text>
+<path d="M 24 108 H 48 V 94 H 72 V 80 H 96 V 66 H 120 V 52 H 144 V 38 H 220" class="tratto"/>
+<g class="interruttore int-a" role="button" tabindex="0" aria-label="interruttore in basso alle scale"><rect x="6" y="78" width="16" height="22" rx="2" class="piastra"/><line x1="14" y1="89" x2="14" y2="98" class="leva giu"/><line x1="14" y1="89" x2="14" y2="80" class="leva su"/></g>
+<g class="interruttore int-b" role="button" tabindex="0" aria-label="interruttore in cima alle scale"><rect x="206" y="12" width="16" height="22" rx="2" class="piastra"/><line x1="214" y1="23" x2="214" y2="31" class="leva giu"/><line x1="214" y1="23" x2="214" y2="15" class="leva su"/></g>
 </svg>
-<span class="rm-eti">LA SCALA VERA</span>
-</div>
-<div class="rm-lamp-blocco">
-<svg viewBox="0 0 150 104" class="rm-scena" id="rm-scena-rete" aria-hidden="true">
-<rect x="1" y="1" width="148" height="102" rx="4" class="sfondo"/>
-<polygon class="luce" points="75,34 40,92 110,92"/>
-<path d="M 11 70 V 8 H 75 M 139 26 V 8 H 75 M 75 8 V 28" class="filo"/>
-<circle cx="75" cy="34" r="6" class="bulbo"/>
-<path d="M 18 92 H 36 V 80 H 54 V 68 H 72 V 56 H 90 V 44 H 108" class="tratto"/>
-<g class="interruttore int-a"><rect x="6" y="70" width="10" height="14" rx="2" class="piastra"/><line x1="11" y1="77" x2="11" y2="84" class="leva giu"/><line x1="11" y1="77" x2="11" y2="70" class="leva su"/></g>
-<g class="interruttore int-b"><rect x="134" y="26" width="10" height="14" rx="2" class="piastra"/><line x1="139" y1="33" x2="139" y2="40" class="leva giu"/><line x1="139" y1="33" x2="139" y2="26" class="leva su"/></g>
-</svg>
-<span class="rm-eti">SECONDO LA RETE</span>
-</div>
-</div>
+<p class="rm-eti"><span class="rm-lampa-piena" aria-hidden="true"></span> PIENA: LA LUCE VERA &middot; <span class="rm-lampa-tratt" aria-hidden="true"></span> TRATTEGGIATA: SECONDO LA RETE</p>
 <p class="rm-stato" id="rm-verdetto" role="status">&hellip;</p>
-<details class="rm-mappa">
-<summary>LA MAPPA DI TUTTE LE POSIZIONI</summary>
-<p class="rm-eti"><span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
-<canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due deviatori, con le quattro combinazioni agli angoli"></canvas>
-</details>
+
 </div>
 <div class="rm-comandi">
+<p class="rm-eti rm-fase">FASE 2 &middot; L'ADDESTRAMENTO, DA GUARDARE</p>
 <p class="rm-eti">LA CURVA DELLO STRATO NASCOSTO
 <span role="group" aria-label="scelta della funzione di attivazione">
 <button type="button" class="rm-att attiva" data-curva="sigmoide" aria-pressed="true">sigmoide</button>
@@ -122,8 +94,11 @@ i pesi si rimescolano da soli.</p>
 <button type="button" id="rm-passo">Un passo</button>
 <button type="button" id="rm-ricomincia">Ricomincia</button>
 </div>
-<p class="rm-stato" id="rm-stato" role="status">Pesi a caso. Muovete i deviatori e cercate dove la rete sbaglia, poi premete &laquo;Addestra&raquo;.</p>
-<p class="rm-stato" id="rm-pesi"></p>
+<p class="rm-stato" id="rm-stato" role="status">Pesi a caso. Fase 1: toccate gli interruttori nella scena e cercate dove la rete sbaglia. Poi &laquo;Addestra&raquo;.</p>
+<p class="rm-eti">LA MAPPA SI RIDISEGNA A OGNI GIRO &middot; <span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
+<canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due interruttori, ridisegnata a ogni giro di addestramento"></canvas>
+<p class="rm-eti">I NOVE NUMERI, ADESSO</p>
+<p class="rm-stato" id="rm-numeri">&ndash;</p>
 </div>
 </div>
 <script>
@@ -259,6 +234,13 @@ i pesi si rimescolano da soli.</p>
       scheda.classList.toggle("giusta", (p > 0.5) === (tv === 1));
     });
     giocata();
+    const elNumeri = document.getElementById("rm-numeri");
+    if (elNumeri) {
+      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "\u2212");
+      elNumeri.textContent = "nascosto 1: " + n(P.w1[0][0]) + " " + n(P.w1[0][1]) + " (soglia " + n(-P.s1[0]) + ") \u00b7 nascosto 2: " +
+        n(P.w1[1][0]) + " " + n(P.w1[1][1]) + " (" + n(-P.s1[1]) + ") \u00b7 uscita: " +
+        n(P.w2[0]) + " " + n(P.w2[1]) + " (" + n(-P.s2) + ")";
+    }
     // i quattro punti sulla mappa: pieni = va accesa, vuoti = va spenta
     for (const [x, y, tv] of ESEMPI) {
       const px = (x - MIN) / LARG * (G - 1);
@@ -281,14 +263,8 @@ i pesi si rimescolano da soli.</p>
       esito = "imparato";
       stato.textContent = "La luce delle scale è imparata in " + giri + " giri" +
         (tentativi > 1 ? ", al tentativo " + tentativi : "") +
-        ": provate a coglierla in fallo coi deviatori.";
-      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "−");
-      const elPesi = document.getElementById("rm-pesi");
-      if (elPesi) elPesi.textContent = "Il bottino, nove numeri trovati da sola - nascosto 1: pesi " +
-        n(P.w1[0][0]) + " e " + n(P.w1[0][1]) + ", soglia " + n(-P.s1[0]) +
-        " · nascosto 2: " + n(P.w1[1][0]) + " e " + n(P.w1[1][1]) + ", soglia " + n(-P.s1[1]) +
-        " · uscita: " + n(P.w2[0]) + " e " + n(P.w2[1]) + ", soglia " + n(-P.s2) +
-        ". Le regole, scritte in numeri.";
+        ": i nove numeri si sono fermati - quello è il modello. Tornate alla scena e provate a coglierla in fallo.";
+
       ferma();
     } else if (giri >= 4000 && esito === "corre") {
       // la discesa si e' incagliata: pesi rimescolati da soli, si riparte
@@ -345,31 +321,33 @@ i pesi si rimescolano da soli.</p>
     tassoV.textContent = parseFloat(tasso.value).toFixed(1).replace(".", ",");
   });
 
-  /* ---- il gioco: i deviatori, le due scale, il verdetto ---- */
+  /* ---- il gioco: la scena unica, gli interruttori, il verdetto ---- */
+  const scena = document.getElementById("rm-scena");
   function giocata() {
-    if (!verdetto) return;
+    if (!scena || !verdetto) return;
     const vera = posA ^ posB;
     const rete = inAvanti(posA, posB).p > 0.5 ? 1 : 0;
-    for (const s of scene) {
-      s.classList.toggle("dev-a-su", posA === 1);
-      s.classList.toggle("dev-b-su", posB === 1);
-    }
-    if (scene[0]) scene[0].classList.toggle("accesa", vera === 1);
-    if (scene[1]) scene[1].classList.toggle("accesa", rete === 1);
+    scena.classList.toggle("dev-a-su", posA === 1);
+    scena.classList.toggle("dev-b-su", posB === 1);
+    scena.classList.toggle("accesa-vera", vera === 1);
+    scena.classList.toggle("accesa-rete", rete === 1);
     verdetto.textContent = vera === rete
-      ? "Qui le due scale coincidono: la rete ci prende."
-      : "Trovata! Qui la rete sbaglia: la luce vera è " + (vera ? "accesa" : "spenta") + ". Addestratela.";
+      ? "Le due lampadine concordano: qui la rete ci prende."
+      : "Trovata! La luce vera \u00e8 " + (vera ? "accesa" : "spenta") +
+        ", ma la rete la " + (rete ? "accenderebbe" : "spegnerebbe") + ". Fase 2: addestratela.";
   }
-  function cambiaDeviatore(bottone, quale) {
-    const su = bottone.getAttribute("aria-pressed") !== "true";
-    bottone.setAttribute("aria-pressed", su ? "true" : "false");
-    bottone.classList.toggle("su", su);
-    bottone.querySelector("span").innerHTML = su ? "&uArr;" : "&dArr;";
-    if (quale === "a") posA = su ? 1 : 0; else posB = su ? 1 : 0;
+  function commuta(quale) {
+    if (quale === "a") posA ^= 1; else posB ^= 1;
     giocata();
   }
-  if (devA) devA.addEventListener("click", () => cambiaDeviatore(devA, "a"));
-  if (devB) devB.addEventListener("click", () => cambiaDeviatore(devB, "b"));
+  for (const [classe, quale] of [[".int-a", "a"], [".int-b", "b"]]) {
+    const g2 = scena && scena.querySelector(classe);
+    if (!g2) continue;
+    g2.addEventListener("click", () => commuta(quale));
+    g2.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); commuta(quale); }
+    });
+  }
 
   ricomincia();
   disegna();
