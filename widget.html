@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La rete che impara XOR davanti a voi</title>
+<style>
+:root{color-scheme:light dark;
+  --sfondo:#fbfaf7;--rialzo:#f4f2ec;--testo:#16161a;--tenue:#6b6b76;
+  --filetto:#918a78;--accento:#a6431e;--secondario:#1c6b66}
+@media (prefers-color-scheme:dark){:root{
+  --sfondo:#16161a;--rialzo:#24242a;--testo:#e8e6e1;--tenue:#a3a3ad;
+  --filetto:#757581;--accento:#e0713f;--secondario:#5fb0a8}}
+body{font-family:system-ui,sans-serif;background:var(--sfondo);color:var(--testo);
+  margin:0;padding:2rem 1rem;display:grid;justify-content:center;gap:1rem}
+h1{font-size:1.1rem;margin:0}
+p.nota{color:var(--tenue);font-size:0.85rem;max-width:36rem;margin:0}
+.rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);
+  padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:auto 1fr;align-items:start;max-width:40rem}
+@media (max-width:40em){.rm-widget{grid-template-columns:1fr}}
+.rm-eti{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;
+  color:var(--tenue);text-transform:uppercase;margin:0 0 0.4rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+#rm-tela{width:224px;height:224px;max-width:100%;image-rendering:pixelated;background:var(--sfondo);
+  border:1px solid var(--filetto);border-radius:6px;display:block}
+.rm-comandi{display:grid;gap:0.6rem;align-content:start;min-width:16rem}
+.rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
+.rm-valore{color:var(--testo)}
+.rm-bottoni{display:flex;gap:0.6rem;flex-wrap:wrap}
+.rm-bottoni button, .rm-att{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--testo);background:var(--sfondo);
+  border:1px solid var(--filetto);border-radius:6px;padding:0.25rem 0.5rem;cursor:pointer}
+.rm-bottoni button:hover, .rm-att:hover{border-color:var(--accento)}
+.rm-att.attiva{border-color:var(--accento);color:var(--accento)}
+.rm-stato{font-family:ui-monospace,monospace;font-size:0.75rem;color:var(--tenue);margin:0}
+.rm-chip{display:inline-block;width:0.75em;height:0.75em;border-radius:2px}
+.rm-chip-si{background:var(--accento)}
+.rm-chip-no{background:var(--secondario)}
+.rm-tinta-accento{color:var(--accento)}
+.rm-tinta-secondario{color:var(--secondario)}
+.rm-tinta-testo{color:var(--testo)}
+</style>
+<body>
+<h1>La rete che impara XOR davanti a voi</h1>
+<p class="nota">La rete 2-2-1 dell'articolo parte da pesi a caso e scende il gradiente.
+Scegliete la curva dello strato nascosto e il tasso di apprendimento; quando la discesa
+si incaglia, «Ricomincia» rimescola i pesi.</p>
+<div class="rm-widget" id="rm-widget">
+<div>
+<p class="rm-eti">LA RISPOSTA DELLA RETE, PUNTO PER PUNTO</p>
+<canvas id="rm-tela" aria-label="la risposta della rete su tutto il quadrato degli ingressi, coi quattro punti XOR"></canvas>
+<p class="rm-eti"><span class="rm-chip rm-chip-si"></span> LA RETE DICE 1 &middot; <span class="rm-chip rm-chip-no"></span> DICE 0</p>
+<p class="rm-eti">I PUNTI PIENI VOGLIONO 1, I VUOTI 0: VINCE QUANDO OGNUNO STA NEL SUO COLORE</p>
+</div>
+<div class="rm-comandi">
+<p class="rm-eti">LA CURVA DELLO STRATO NASCOSTO
+<span role="group" aria-label="scelta della funzione di attivazione">
+<button type="button" class="rm-att attiva" data-curva="sigmoide" aria-pressed="true">sigmoide</button>
+<button type="button" class="rm-att" data-curva="tanh" aria-pressed="false">tanh</button>
+<button type="button" class="rm-att" data-curva="relu" aria-pressed="false">ReLU</button>
+</span></p>
+<label class="rm-eti" for="rm-tasso">TASSO DI APPRENDIMENTO <span id="rm-tasso-v">2,0</span></label>
+<input type="range" id="rm-tasso" min="0.2" max="8" step="0.2" value="2" />
+<p class="rm-eti">GIRI <span class="rm-valore" id="rm-giri">0</span> &middot; ERRORE MEDIO <span class="rm-valore" id="rm-errore">&ndash;</span></p>
+<div class="rm-bottoni">
+<button type="button" id="rm-addestra">Addestra</button>
+<button type="button" id="rm-passo">Un passo</button>
+<button type="button" id="rm-ricomincia">Ricomincia</button>
+</div>
+<p class="rm-stato" id="rm-stato" role="status">Pesi a caso, nove parametri. Premete «Addestra».</p>
+</div>
+</div>
+<script>
+/* Il widget delle reti multistrato: la rete 2-2-1 dell'articolo parte da
+   pesi casuali e impara XOR con la retropropagazione, davanti al lettore.
+   Si sceglie la funzione di attivazione dello strato nascosto (sigmoide,
+   tanh, ReLU) e il tasso di apprendimento; la superficie di decisione si
+   piega a ogni giro. JavaScript puro, zero dipendenze. */
+(() => {
+  "use strict";
+  const radice = document.getElementById("rm-widget");
+  if (!radice) return;
+  const tela = document.getElementById("rm-tela");
+  const stato = document.getElementById("rm-stato");
+  const elGiri = document.getElementById("rm-giri");
+  const elErrore = document.getElementById("rm-errore");
+  const bottoni = [...radice.querySelectorAll(".rm-att")];
+  const tasso = document.getElementById("rm-tasso");
+  const tassoV = document.getElementById("rm-tasso-v");
+  const G = 56;                      // celle della superficie
+  tela.width = G; tela.height = G;
+  const g = tela.getContext("2d");
+
+  const ESEMPI = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]];
+
+  /* ---- le curve e le loro pendenze ---- */
+  const CURVE = {
+    sigmoide: { f: (z) => 1 / (1 + Math.exp(-z)), df: (z, a) => a * (1 - a) },
+    tanh: { f: Math.tanh, df: (z, a) => 1 - a * a },
+    relu: { f: (z) => (z > 0 ? z : 0), df: (z) => (z > 0 ? 1 : 0) },
+  };
+  let curva = "sigmoide";
+
+  /* ---- la rete: 2 ingressi, 2 nascosti, 1 uscita (sempre sigmoide) ---- */
+  let P = null, giri = 0, esito = "corre", tentativi = 1;
+  function ricomincia(mantieniTentativi) {
+    const c = () => Math.random() * 2 - 1;
+    P = { w1: [[c(), c()], [c(), c()]], s1: [c(), c()], w2: [c(), c()], s2: c() };
+    giri = 0; esito = "corre";
+    if (!mantieniTentativi) tentativi = 1;
+  }
+  function inAvanti(x, y) {
+    const att = CURVE[curva];
+    const z = [0, 1].map((j) => P.w1[j][0] * x + P.w1[j][1] * y + P.s1[j]);
+    const a = z.map(att.f);
+    const z2 = P.w2[0] * a[0] + P.w2[1] * a[1] + P.s2;
+    const p = 1 / (1 + Math.exp(-z2));
+    return { z, a, p };
+  }
+  function unGiro() {
+    // un giro = i quattro esempi insieme (gradiente accumulato, poi il passo)
+    const att = CURVE[curva];
+    const eta = parseFloat(tasso.value) / ESEMPI.length;
+    const gw1 = [[0, 0], [0, 0]], gs1 = [0, 0], gw2 = [0, 0];
+    let gs2 = 0, errore = 0, giuste = 0;
+    for (const [x, y, t] of ESEMPI) {
+      const { z, a, p } = inAvanti(x, y);
+      const d2 = p - t;                       // errore in uscita
+      errore += Math.abs(d2);
+      if ((p > 0.5) === (t === 1)) giuste++;
+      for (const j of [0, 1]) {
+        gw2[j] += d2 * a[j];
+        const d1 = d2 * P.w2[j] * att.df(z[j], a[j]);   // la colpa ripartita
+        gw1[j][0] += d1 * x; gw1[j][1] += d1 * y; gs1[j] += d1;
+      }
+      gs2 += d2;
+    }
+    for (const j of [0, 1]) {
+      P.w2[j] -= eta * gw2[j];
+      P.w1[j][0] -= eta * gw1[j][0]; P.w1[j][1] -= eta * gw1[j][1];
+      P.s1[j] -= eta * gs1[j];
+    }
+    P.s2 -= eta * gs2;
+    giri++;
+    return { errore: errore / ESEMPI.length, giuste };
+  }
+
+  /* ---- colori del tema, con ritinta al cambio ---- */
+  let tinte = null;
+  const cvTinta = document.createElement("canvas");
+  cvTinta.width = 1; cvTinta.height = 1;
+  function tinta(classe) {
+    const s = document.createElement("span");
+    s.className = classe; s.style.display = "none";
+    document.body.appendChild(s);
+    const colore = getComputedStyle(s).color;
+    s.remove();
+    const gc = cvTinta.getContext("2d", { willReadFrequently: true });
+    gc.clearRect(0, 0, 1, 1); gc.fillStyle = colore; gc.fillRect(0, 0, 1, 1);
+    return gc.getImageData(0, 0, 1, 1).data.slice(0, 3);
+  }
+  function tinteCorrenti() {
+    if (!tinte) tinte = {
+      si: tinta("rm-tinta-accento"),
+      no: tinta("rm-tinta-secondario"),
+      punto: tinta("rm-tinta-testo"),
+    };
+    return tinte;
+  }
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { tinte = null; disegna(); });
+  new MutationObserver(() => { tinte = null; disegna(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  /* ---- la superficie di decisione: ruggine dove dice 1 ---- */
+  const MIN = -0.25, LARG = 1.5;
+  function disegna() {
+    const t = tinteCorrenti();
+    const img = g.createImageData(G, G);
+    for (let r = 0; r < G; r++) {
+      const y = MIN + LARG * (1 - r / (G - 1));
+      for (let c2 = 0; c2 < G; c2++) {
+        const x = MIN + LARG * (c2 / (G - 1));
+        const { p } = inAvanti(x, y);
+        const colore = p > 0.5 ? t.si : t.no;
+        const o = (r * G + c2) * 4;
+        img.data[o] = colore[0]; img.data[o + 1] = colore[1]; img.data[o + 2] = colore[2];
+        img.data[o + 3] = Math.round(Math.min(1, Math.abs(p - 0.5) * 2) * 210);
+      }
+    }
+    g.putImageData(img, 0, 0);
+    // i quattro punti: pieni = risposta 1, vuoti = risposta 0
+    for (const [x, y, tv] of ESEMPI) {
+      const px = (x - MIN) / LARG * (G - 1);
+      const py = (1 - (y - MIN) / LARG) * (G - 1);
+      g.beginPath();
+      g.arc(px, py, 2.6, 0, 2 * Math.PI);
+      const inchiostro = "rgb(" + t.punto.join(",") + ")";
+      if (tv === 1) { g.fillStyle = inchiostro; g.fill(); }
+      else { g.lineWidth = 1.2; g.strokeStyle = inchiostro; g.stroke(); }
+    }
+  }
+
+  /* ---- i comandi ---- */
+  let corsa = null;
+  function aggiorna(errore, giuste) {
+    elGiri.textContent = giri;
+    elErrore.textContent = errore.toFixed(3).replace(".", ",");
+    if (giuste === 4 && errore < 0.05 && esito === "corre") {
+      esito = "imparato";
+      stato.textContent = "XOR imparato in " + giri + " giri" +
+        (tentativi > 1 ? ", al tentativo " + tentativi : "") +
+        ": ogni punto è nel suo colore.";
+      ferma();
+    } else if (giri >= 4000 && esito === "corre") {
+      // la discesa si e' incagliata: pesi rimescolati da soli, si riparte
+      tentativi++;
+      ricomincia(true);
+      stato.textContent = "Discesa incagliata (capita, soprattutto con la ReLU): pesi rimescolati da soli, tentativo " + tentativi + "…";
+    }
+  }
+  function passo() {
+    const { errore, giuste } = unGiro();
+    disegna(); aggiorna(errore, giuste);
+  }
+  function giroDiCorsa() {
+    let r = null;
+    for (let k = 0; k < 24 && esito === "corre"; k++) r = unGiro();
+    if (r) { disegna(); aggiorna(r.errore, r.giuste); }
+    if (esito === "corre") corsa = requestAnimationFrame(giroDiCorsa);
+  }
+  function ferma() {
+    if (corsa) { cancelAnimationFrame(corsa); corsa = null; }
+    document.getElementById("rm-addestra").textContent = "Addestra";
+  }
+  document.getElementById("rm-addestra").addEventListener("click", () => {
+    if (corsa) { ferma(); stato.textContent = "In pausa al giro " + giri + "."; return; }
+    if (esito !== "corre") return;
+    document.getElementById("rm-addestra").textContent = "Ferma";
+    stato.textContent = "La discesa è in corso…";
+    corsa = requestAnimationFrame(giroDiCorsa);
+  });
+  document.getElementById("rm-passo").addEventListener("click", () => {
+    if (esito !== "corre") return;
+    ferma(); passo();
+    if (esito === "corre") stato.textContent = "Giro " + giri + ".";
+  });
+  document.getElementById("rm-ricomincia").addEventListener("click", () => {
+    ferma(); ricomincia(); disegna();
+    elGiri.textContent = 0; elErrore.textContent = "–";
+    stato.textContent = "Pesi nuovi, a caso. Obiettivo: ogni punto nel suo colore.";
+  });
+  for (const b of bottoni) {
+    b.addEventListener("click", () => {
+      for (const x of bottoni) { x.classList.remove("attiva"); x.setAttribute("aria-pressed", "false"); }
+      b.classList.add("attiva");
+      b.setAttribute("aria-pressed", "true");
+      curva = b.dataset.curva;
+      ferma(); ricomincia(); disegna();
+      elGiri.textContent = 0; elErrore.textContent = "–";
+      stato.textContent = "Curva " + b.textContent + ", pesi nuovi. Premete «Addestra».";
+    });
+  }
+  tasso.addEventListener("input", () => {
+    tassoV.textContent = parseFloat(tasso.value).toFixed(1).replace(".", ",");
+  });
+
+  ricomincia();
+  disegna();
+})();
+</script>
+</body>
+</html>

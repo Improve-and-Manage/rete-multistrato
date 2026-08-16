@@ -46,3 +46,19 @@ cui il mestiere usa acceleratori di calcolo.
 ## Licenza
 
 [MIT](LICENSE).
+
+## Il widget: la rete che impara davanti a voi
+
+**`widget.html`** è il widget pubblicato nell'articolo: la rete 2-2-1 parte da
+pesi a caso e impara XOR con la retropropagazione, mostrando la superficie di
+decisione che si piega a ogni giro. Si sceglie la curva dello strato nascosto
+(sigmoide, tanh, ReLU) e il tasso di apprendimento: la sigmoide impara con
+calma, la tanh di solito più in fretta, e la ReLU ogni tanto si incaglia - in
+quel caso il widget rimescola i pesi da solo e conta i tentativi. Per provarlo
+in locale:
+
+```
+$ python3 -m http.server
+```
+
+e poi aprite <http://localhost:8000/widget.html>.
