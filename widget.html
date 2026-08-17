@@ -15,7 +15,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 .rm-widget{border:1px solid var(--filetto);border-radius:6px;background:var(--rialzo);padding:1.25rem;display:grid;gap:1.25rem;grid-template-columns:1fr;margin-block:1rem}
 .rm-eti{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;color:var(--tenue);text-transform:uppercase;margin:0 0 0.3rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
 #rm-tela{width:100%;max-width:224px;height:auto;aspect-ratio:1/1;image-rendering:pixelated;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;display:block}
-.rm-scena{width:min(100%,480px);height:auto;display:block;margin-bottom:0.3rem;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px}
+.rm-scena{width:min(100%,480px);height:auto;display:block;margin-bottom:0.3rem;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .rm-scena .filo{stroke:var(--filetto);fill:none;stroke-width:1.5}
 .rm-scena .contatto{fill:var(--filetto)}
 .rm-scena .percorso{stroke:var(--accento);stroke-width:2.5;fill:none;display:none}
@@ -37,21 +37,26 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 .rm-scena.vera-accesa .croce{stroke:var(--sfondo)}
 .rm-scena .lampada-rete{stroke-dasharray:3 2}
 .rm-scena.rete-accesa .lampada-rete{fill:var(--accento)}
-.rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:0.06em;fill:var(--tenue)}
+.rm-scena .eti-svg{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.06em;fill:var(--tenue)}
 @media (prefers-reduced-motion: reduce){.rm-scena .luce{transition:none}}
 .rm-fase{color:var(--accento)}
 .rm-testata{font-size:0.9375rem;color:var(--testo);margin:0;padding-bottom:0.6rem;border-bottom:1px solid var(--filetto)}
-.rm-visori{display:grid;grid-template-columns:minmax(170px,224px) minmax(200px,320px);column-gap:1rem;row-gap:0.3rem;align-items:start}
+.rm-visori{display:grid;grid-template-columns:minmax(170px,224px) minmax(200px,320px);column-gap:1rem;row-gap:0.6rem;align-items:start}
 @media (max-width:38em){.rm-visori{grid-template-columns:1fr}}
-.rm-grafici{display:grid;gap:0.3rem;align-content:start}
+.rm-visore{display:grid;gap:0.3rem;align-content:start}
 #rm-loss{width:100%;max-width:320px;height:auto;aspect-ratio:7/3;display:block;background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px}
 .rm-comandi{display:grid;gap:0.6rem;align-content:start;border-top:1px solid var(--filetto);padding-top:0.6rem}
 .rm-comandi input[type="range"]{max-width:320px}
 .rm-comandi input[type="range"]{width:100%;accent-color:var(--accento)}
 .rm-valore{color:var(--testo)}
 .rm-bottoni{display:flex;gap:0.6rem;flex-wrap:wrap}
-.rm-bottoni button, .rm-att{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--testo);background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer}
+.rm-bottoni button, .rm-att{font-family:ui-monospace,monospace;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--testo);background:var(--sfondo);border:1px solid var(--filetto);border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .rm-att{padding:0 0.6rem}
+@media (pointer:coarse){
+.rm-bottoni button{min-height:44px;min-width:44px}
+.rm-att{min-height:36px;padding:0.3rem 0.6rem}
+.rm-comandi input[type="range"]{height:44px}
+}
 .rm-bottoni button:hover, .rm-att:hover{border-color:var(--accento)}
 .rm-att.attiva{border-color:var(--accento);color:var(--accento)}
 .rm-stato{font-family:ui-monospace,monospace;font-size:0.7rem;color:var(--tenue);margin:0}
@@ -119,10 +124,12 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 </div>
 <p class="rm-stato" id="rm-stato" role="status">Pesi a caso. Fase 1: toccate gli interruttori nella scena e cercate dove la rete sbaglia. Poi &laquo;Addestra&raquo;.</p>
 <div class="rm-visori">
+<div class="rm-visore">
 <p class="rm-eti">LA MAPPA <span class="rm-voce"><span class="rm-chip rm-chip-si"></span> ACCESA</span> <span class="rm-voce"><span class="rm-chip rm-chip-no"></span> SPENTA</span></p>
-<p class="rm-eti">L'ERRORE, GIRO PER GIRO</p>
 <canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due interruttori, ridisegnata a ogni giro di addestramento"></canvas>
-<div class="rm-grafici">
+</div>
+<div class="rm-visore">
+<p class="rm-eti">L'ERRORE, GIRO PER GIRO</p>
 <canvas id="rm-loss" width="280" height="120" aria-label="la curva dell'errore medio, aggiornata a ogni giro di addestramento"></canvas>
 </div>
 </div>
@@ -137,24 +144,28 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 (() => {
   "use strict";
   const radice = document.getElementById("rm-widget");
-  if (!radice) return;
+  if (!radice || radice.dataset.rmAvviato) return;
+  radice.dataset.rmAvviato = "1";
   const tela = document.getElementById("rm-tela");
   const stato = document.getElementById("rm-stato");
   const elGiri = document.getElementById("rm-giri");
   const elErrore = document.getElementById("rm-errore");
   const bottoni = [...radice.querySelectorAll(".rm-att")];
   const elGiuste = document.getElementById("rm-giuste");
-  const casi = [...radice.querySelectorAll(".rm-caso")];
-  const devA = document.getElementById("rm-dev-a");
-  const devB = document.getElementById("rm-dev-b");
-  const scene = [document.getElementById("rm-scena-vera"), document.getElementById("rm-scena-rete")].filter(Boolean);
   const verdetto = document.getElementById("rm-verdetto");
-  let posA = 0, posB = 0;   // 0 = giu', 1 = su
   const tasso = document.getElementById("rm-tasso");
   const tassoV = document.getElementById("rm-tasso-v");
+  const btnAddestra = document.getElementById("rm-addestra");
+  const btnPasso = document.getElementById("rm-passo");
+  const btnRicomincia = document.getElementById("rm-ricomincia");
+  if (!tela || !stato || !elGiri || !elErrore || !elGiuste || !tasso ||
+      !tassoV || !btnAddestra || !btnPasso || !btnRicomincia) return;
+  let posA = 0, posB = 0;   // 0 = giu', 1 = su
   const G = 56;                      // celle della superficie
   tela.width = G; tela.height = G;
   const g = tela.getContext("2d");
+  if (!g) return;
+  const img = g.createImageData(G, G);   // riusata a ogni ridisegno
 
   const ESEMPI = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]];
 
@@ -183,10 +194,21 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     const p = 1 / (1 + Math.exp(-z2));
     return { z, a, p };
   }
+  // solo la probabilita', senza allocare: e' la via battuta dalle 3136 celle
+  function previsione(x, y) {
+    const f = CURVE[curva].f;
+    const a0 = f(P.w1[0][0] * x + P.w1[0][1] * y + P.s1[0]);
+    const a1 = f(P.w1[1][0] * x + P.w1[1][1] * y + P.s1[1]);
+    return 1 / (1 + Math.exp(-(P.w2[0] * a0 + P.w2[1] * a1 + P.s2)));
+  }
+  function tassoCorrente() {
+    const v = parseFloat(tasso.value);
+    return Number.isFinite(v) ? v : 2;
+  }
   function unGiro() {
     // un giro = i quattro esempi insieme (gradiente accumulato, poi il passo)
     const att = CURVE[curva];
-    const eta = parseFloat(tasso.value) / ESEMPI.length;
+    const eta = tassoCorrente() / ESEMPI.length;
     const gw1 = [[0, 0], [0, 0]], gs1 = [0, 0], gw2 = [0, 0];
     let gs2 = 0, errore = 0, giuste = 0;
     for (const [x, y, t] of ESEMPI) {
@@ -196,7 +218,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       if ((p > 0.5) === (t === 1)) giuste++;
       for (const j of [0, 1]) {
         gw2[j] += d2 * a[j];
-        const d1 = d2 * P.w2[j] * att.df(z[j], a[j]);   // la colpa ripartita
+        const d1 = d2 * P.w2[j] * att.df(z[j], a[j]);   // l'errore ripartito
         gw1[j][0] += d1 * x; gw1[j][1] += d1 * y; gs1[j] += d1;
       }
       gs2 += d2;
@@ -209,7 +231,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     P.s2 -= eta * gs2;
     giri++;
     const e = errore / ESEMPI.length;
-    storia.push([e, P.w1[0][0], P.w1[0][1], -P.s1[0], P.w1[1][0], P.w1[1][1], -P.s1[1], P.w2[0], P.w2[1], -P.s2]);
+    storia.push(e);
     return { errore: e, giuste };
   }
 
@@ -235,19 +257,31 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     };
     return tinte;
   }
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { tinte = null; disegna(); });
-  new MutationObserver(() => { tinte = null; disegna(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  const alCambioTema = () => { tinte = null; disegna(); };
+  const schema = window.matchMedia("(prefers-color-scheme: dark)");
+  if (schema.addEventListener) schema.addEventListener("change", alCambioTema);
+  else if (schema.addListener) schema.addListener(alCambioTema);
+  new MutationObserver(alCambioTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  /* ---- fuori dallo schermo non si disegna: il ridisegno aspetta il rientro ---- */
+  let inVista = true, daRidisegnare = false;
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((voci) => {
+      inVista = voci[0].isIntersecting;
+      if (inVista && daRidisegnare) { daRidisegnare = false; disegna(); }
+    }).observe(radice);
+  }
 
   /* ---- la superficie di decisione: ruggine dove dice 1 ---- */
   const MIN = -0.25, LARG = 1.5;
   function disegna() {
+    if (!inVista) { daRidisegnare = true; return; }
     const t = tinteCorrenti();
-    const img = g.createImageData(G, G);
     for (let r = 0; r < G; r++) {
       const y = MIN + LARG * (1 - r / (G - 1));
       for (let c2 = 0; c2 < G; c2++) {
         const x = MIN + LARG * (c2 / (G - 1));
-        const { p } = inAvanti(x, y);
+        const p = previsione(x, y);
         const colore = p > 0.5 ? t.si : t.no;
         const o = (r * G + c2) * 4;
         img.data[o] = colore[0]; img.data[o + 1] = colore[1]; img.data[o + 2] = colore[2];
@@ -255,14 +289,6 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       }
     }
     g.putImageData(img, 0, 0);
-    // le quattro lampadine: accesa se la rete direbbe 1; bordo acceso se giusta
-    ESEMPI.forEach(([x, y, tv], i) => {
-      const { p } = inAvanti(x, y);
-      const scheda = casi[i];
-      if (!scheda) return;
-      scheda.querySelector(".rm-lampada").classList.toggle("accesa", p > 0.5);
-      scheda.classList.toggle("giusta", (p > 0.5) === (tv === 1));
-    });
     giocata();
     disegnaGrafici();
     // i quattro punti sulla mappa: pieni = va accesa, vuoti = va spenta
@@ -285,12 +311,12 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     elErrore.textContent = errore.toFixed(3).replace(".", ",");
     if (giuste === 4 && errore < 0.05 && esito === "corre") {
       esito = "imparato";
-      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "\u2212");
+      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "−");
       stato.textContent = "La luce delle scale è imparata in " + giri + " giri" +
         (tentativi > 1 ? ", al tentativo " + tentativi : "") +
         ": i nove numeri si sono fermati - quello è il modello. Eccolo: nascosto 1: " +
-        n(P.w1[0][0]) + " " + n(P.w1[0][1]) + " (soglia " + n(-P.s1[0]) + ") \u00b7 nascosto 2: " +
-        n(P.w1[1][0]) + " " + n(P.w1[1][1]) + " (" + n(-P.s1[1]) + ") \u00b7 uscita: " +
+        n(P.w1[0][0]) + " " + n(P.w1[0][1]) + " (soglia " + n(-P.s1[0]) + ") · nascosto 2: " +
+        n(P.w1[1][0]) + " " + n(P.w1[1][1]) + " (" + n(-P.s1[1]) + ") · uscita: " +
         n(P.w2[0]) + " " + n(P.w2[1]) + " (" + n(-P.s2) + "). Tornate alla scena e provate a coglierla in fallo.";
 
       ferma();
@@ -300,6 +326,9 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       ricomincia(true);
       stato.textContent = "Discesa incagliata (capita, soprattutto con la ReLU): pesi rimescolati da soli, tentativo " + tentativi + "…";
     }
+  }
+  function azzera() {
+    elGiri.textContent = 0; elErrore.textContent = "–"; elGiuste.textContent = "–";
   }
   function passo() {
     const { errore, giuste } = unGiro();
@@ -313,24 +342,22 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
   }
   function ferma() {
     if (corsa) { cancelAnimationFrame(corsa); corsa = null; }
-    document.getElementById("rm-addestra").textContent = "Addestra";
+    btnAddestra.textContent = "Addestra";
   }
-  document.getElementById("rm-addestra").addEventListener("click", () => {
+  btnAddestra.addEventListener("click", () => {
     if (corsa) { ferma(); stato.textContent = "In pausa al giro " + giri + "."; return; }
     if (esito !== "corre") return;
-    document.getElementById("rm-addestra").textContent = "Ferma";
+    btnAddestra.textContent = "Ferma";
     stato.textContent = "La discesa è in corso…";
     corsa = requestAnimationFrame(giroDiCorsa);
   });
-  document.getElementById("rm-passo").addEventListener("click", () => {
+  btnPasso.addEventListener("click", () => {
     if (esito !== "corre") return;
     ferma(); passo();
     if (esito === "corre") stato.textContent = "Giro " + giri + ".";
   });
-  document.getElementById("rm-ricomincia").addEventListener("click", () => {
-    ferma(); ricomincia(); disegna();
-    elGiri.textContent = 0; elErrore.textContent = "–"; elGiuste.textContent = "–";
-    const ep = document.getElementById("rm-pesi"); if (ep) ep.textContent = "";
+  btnRicomincia.addEventListener("click", () => {
+    ferma(); ricomincia(); disegna(); azzera();
     stato.textContent = "Pesi nuovi, a caso. Cercate dove sbaglia, poi «Addestra».";
   });
   for (const b of bottoni) {
@@ -339,19 +366,37 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       b.classList.add("attiva");
       b.setAttribute("aria-pressed", "true");
       curva = b.dataset.curva;
-      ferma(); ricomincia(); disegna();
-      elGiri.textContent = 0; elErrore.textContent = "–"; elGiuste.textContent = "–";
-      const ep = document.getElementById("rm-pesi"); if (ep) ep.textContent = "";
+      ferma(); ricomincia(); disegna(); azzera();
       stato.textContent = "Curva " + b.textContent + ", pesi nuovi. Premete «Addestra».";
     });
   }
   tasso.addEventListener("input", () => {
-    tassoV.textContent = parseFloat(tasso.value).toFixed(1).replace(".", ",");
+    tassoV.textContent = tassoCorrente().toFixed(1).replace(".", ",");
   });
 
 
   /* ---- il grafico dell'errore, coi valori di partenza e di adesso ---- */
   const cvLoss = document.getElementById("rm-loss");
+  const gl = cvLoss && cvLoss.getContext("2d");
+  let lossL = 280, lossA = 120, scala = 1;
+  function misuraLoss() {
+    if (!cvLoss) return;
+    // il retro della tela segue i pixel veri dello schermo: niente sfocatura retina
+    scala = Math.min(window.devicePixelRatio || 1, 3);
+    lossL = cvLoss.clientWidth || 280;
+    lossA = Math.round(lossL * 3 / 7);
+    cvLoss.width = Math.round(lossL * scala);
+    cvLoss.height = Math.round(lossA * scala);
+  }
+  if (cvLoss && "ResizeObserver" in window) {
+    let misurata = false;
+    new ResizeObserver(() => {
+      const prima = lossL;
+      misuraLoss();
+      if (misurata && prima !== lossL) disegnaGrafici();
+      misurata = true;
+    }).observe(cvLoss);
+  }
   function campiona(larghezza) {
     if (storia.length < 2) return null;
     const passo = Math.max(1, Math.floor(storia.length / larghezza));
@@ -361,33 +406,33 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     return punti;
   }
   function disegnaGrafici() {
-    if (!cvLoss) return;
+    if (!gl) return;
     const t = tinteCorrenti();
     const rgb = (c) => "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
-    const L = cvLoss.width, A = cvLoss.height;
-    const gl = cvLoss.getContext("2d");
+    const L = lossL, A = lossA;
+    gl.setTransform(scala, 0, 0, scala, 0, 0);
     gl.clearRect(0, 0, L, A);
     const punti = campiona(L);
     if (!punti) return;
     let maxE = 0.55;
-    for (const r of punti) if (r[0] > maxE) maxE = r[0];
+    for (const e of punti) if (e > maxE) maxE = e;
     gl.strokeStyle = rgb(t.si); gl.lineWidth = 2; gl.beginPath();
-    punti.forEach((r, i) => {
+    punti.forEach((e, i) => {
       const x = i / (punti.length - 1) * (L - 8) + 4;
-      const y = A - 6 - (r[0] / maxE) * (A - 12);
+      const y = A - 6 - (e / maxE) * (A - 12);
       if (i === 0) gl.moveTo(x, y); else gl.lineTo(x, y);
     });
     gl.stroke();
     // i valori nel tempo: da dove la discesa e' partita, dov'e' adesso
     const eti = (v) => v.toFixed(2).replace(".", ",");
-    const yDa = A - 6 - (punti[0][0] / maxE) * (A - 12);
-    const yA = A - 6 - (punti[punti.length - 1][0] / maxE) * (A - 12);
+    const yDa = A - 6 - (punti[0] / maxE) * (A - 12);
+    const yA = A - 6 - (punti[punti.length - 1] / maxE) * (A - 12);
     gl.font = "10px ui-monospace, monospace";
     gl.fillStyle = rgb(t.punto);
     gl.textAlign = "left";
-    gl.fillText(eti(punti[0][0]), 6, Math.min(A - 4, Math.max(12, yDa + 14)));
+    gl.fillText(eti(punti[0]), 6, Math.min(A - 4, Math.max(12, yDa + 14)));
     gl.textAlign = "right";
-    gl.fillText(eti(punti[punti.length - 1][0]), L - 6, Math.min(A - 4, Math.max(12, yA - 6)));
+    gl.fillText(eti(punti[punti.length - 1]), L - 6, Math.min(A - 4, Math.max(12, yA - 6)));
   }
 
   /* ---- il gioco: la scena unica, gli interruttori, il verdetto ---- */
@@ -395,7 +440,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
   function giocata() {
     if (!scena || !verdetto) return;
     const vera = posA ^ posB;
-    const rete = inAvanti(posA, posB).p > 0.5 ? 1 : 0;
+    const rete = previsione(posA, posB) > 0.5 ? 1 : 0;
     scena.classList.toggle("pos-a-1", posA === 1);
     scena.classList.toggle("pos-b-1", posB === 1);
     scena.classList.toggle("chiuso-alto", posA === 1 && posB === 0);
@@ -405,12 +450,12 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     if (giri === 0) {
       verdetto.textContent = vera === rete
         ? "Le due lampadine concordano - ma per caso: coi pesi appena rimescolati la rete tira a indovinare."
-        : "La luce vera \u00e8 " + (vera ? "accesa" : "spenta") +
+        : "La luce vera è " + (vera ? "accesa" : "spenta") +
           "; la rete, coi pesi a caso, la " + (rete ? "accenderebbe" : "spegnerebbe") + ". Fase 2: addestratela.";
     } else {
       verdetto.textContent = vera === rete
         ? "Le due lampadine concordano: qui la rete ci prende."
-        : "Trovata! La luce vera \u00e8 " + (vera ? "accesa" : "spenta") +
+        : "Trovata! La luce vera è " + (vera ? "accesa" : "spenta") +
           ", ma la rete la " + (rete ? "accenderebbe" : "spegnerebbe") + ". Fase 2: addestratela.";
     }
   }
@@ -427,6 +472,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     });
   }
 
+  misuraLoss();
   ricomincia();
   disegna();
 })();

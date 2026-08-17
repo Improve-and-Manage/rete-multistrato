@@ -120,15 +120,15 @@ class ReteMultistrato:
         errori_uscita = [
             probabilita[k] - (1 if k == vera else 0) for k in range(USCITE)
         ]
-        # retropropagazione: la colpa di ogni neurone nascosto e' la somma
+        # retropropagazione: l'errore di ogni neurone nascosto e' la somma
         # degli errori in uscita, pesata dai suoi collegamenti, per la
         # pendenza della sigmoide nel punto in cui lavora
         errori_nascosti = []
         for j in range(NASCOSTI):
-            colpa = 0.0
+            errore = 0.0
             for k in range(USCITE):
-                colpa += errori_uscita[k] * self.pesi2[k][j]
-            errori_nascosti.append(colpa * nascosti[j] * (1 - nascosti[j]))
+                errore += errori_uscita[k] * self.pesi2[k][j]
+            errori_nascosti.append(errore * nascosti[j] * (1 - nascosti[j]))
         # discesa del gradiente: ogni peso si sposta contro il suo errore
         for k in range(USCITE):
             pesi = self.pesi2[k]
