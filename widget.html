@@ -55,6 +55,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 .rm-bottoni button:hover, .rm-att:hover{border-color:var(--accento)}
 .rm-att.attiva{border-color:var(--accento);color:var(--accento)}
 .rm-stato{font-family:ui-monospace,monospace;font-size:0.7rem;color:var(--tenue);margin:0}
+.rm-voce{white-space:nowrap;display:inline-flex;align-items:center;gap:0.35em}
 .rm-chip{display:inline-block;width:0.75em;height:0.75em;border-radius:2px}
 .rm-chip-si{background:var(--accento)}
 .rm-chip-no{background:var(--secondario)}
@@ -118,13 +119,11 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
 </div>
 <p class="rm-stato" id="rm-stato" role="status">Pesi a caso. Fase 1: toccate gli interruttori nella scena e cercate dove la rete sbaglia. Poi &laquo;Addestra&raquo;.</p>
 <div class="rm-visori">
-<p class="rm-eti">LA MAPPA &middot; <span class="rm-chip rm-chip-si"></span> ACCESA &middot; <span class="rm-chip rm-chip-no"></span> SPENTA</p>
+<p class="rm-eti">LA MAPPA <span class="rm-voce"><span class="rm-chip rm-chip-si"></span> ACCESA</span> <span class="rm-voce"><span class="rm-chip rm-chip-no"></span> SPENTA</span></p>
 <p class="rm-eti">L'ERRORE, GIRO PER GIRO</p>
 <canvas id="rm-tela" aria-label="la risposta della rete su tutte le posizioni dei due interruttori, ridisegnata a ogni giro di addestramento"></canvas>
 <div class="rm-grafici">
 <canvas id="rm-loss" width="280" height="120" aria-label="la curva dell'errore medio, aggiornata a ogni giro di addestramento"></canvas>
-<p class="rm-eti">I NOVE NUMERI, ADESSO</p>
-<p class="rm-stato" id="rm-numeri">&ndash;</p>
 </div>
 </div>
 </div>
@@ -266,13 +265,6 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     });
     giocata();
     disegnaGrafici();
-    const elNumeri = document.getElementById("rm-numeri");
-    if (elNumeri) {
-      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "\u2212");
-      elNumeri.textContent = "nascosto 1: " + n(P.w1[0][0]) + " " + n(P.w1[0][1]) + " (soglia " + n(-P.s1[0]) + ") \u00b7 nascosto 2: " +
-        n(P.w1[1][0]) + " " + n(P.w1[1][1]) + " (" + n(-P.s1[1]) + ") \u00b7 uscita: " +
-        n(P.w2[0]) + " " + n(P.w2[1]) + " (" + n(-P.s2) + ")";
-    }
     // i quattro punti sulla mappa: pieni = va accesa, vuoti = va spenta
     for (const [x, y, tv] of ESEMPI) {
       const px = (x - MIN) / LARG * (G - 1);
@@ -293,9 +285,13 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
     elErrore.textContent = errore.toFixed(3).replace(".", ",");
     if (giuste === 4 && errore < 0.05 && esito === "corre") {
       esito = "imparato";
+      const n = (v) => v.toFixed(1).replace(".", ",").replace("-", "\u2212");
       stato.textContent = "La luce delle scale è imparata in " + giri + " giri" +
         (tentativi > 1 ? ", al tentativo " + tentativi : "") +
-        ": i nove numeri si sono fermati - quello è il modello. Tornate alla scena e provate a coglierla in fallo.";
+        ": i nove numeri si sono fermati - quello è il modello. Eccolo: nascosto 1: " +
+        n(P.w1[0][0]) + " " + n(P.w1[0][1]) + " (soglia " + n(-P.s1[0]) + ") \u00b7 nascosto 2: " +
+        n(P.w1[1][0]) + " " + n(P.w1[1][1]) + " (" + n(-P.s1[1]) + ") \u00b7 uscita: " +
+        n(P.w2[0]) + " " + n(P.w2[1]) + " (" + n(-P.s2) + "). Tornate alla scena e provate a coglierla in fallo.";
 
       ferma();
     } else if (giri >= 4000 && esito === "corre") {
@@ -354,7 +350,7 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
   });
 
 
-  /* ---- i grafici: l'errore che scende, le traiettorie dei nove numeri ---- */
+  /* ---- il grafico dell'errore, coi valori di partenza e di adesso ---- */
   const cvLoss = document.getElementById("rm-loss");
   function campiona(larghezza) {
     if (storia.length < 2) return null;
@@ -382,6 +378,16 @@ p.nota{color:var(--tenue);font-size:0.85rem;max-width:40rem;margin:0}
       if (i === 0) gl.moveTo(x, y); else gl.lineTo(x, y);
     });
     gl.stroke();
+    // i valori nel tempo: da dove la discesa e' partita, dov'e' adesso
+    const eti = (v) => v.toFixed(2).replace(".", ",");
+    const yDa = A - 6 - (punti[0][0] / maxE) * (A - 12);
+    const yA = A - 6 - (punti[punti.length - 1][0] / maxE) * (A - 12);
+    gl.font = "10px ui-monospace, monospace";
+    gl.fillStyle = rgb(t.punto);
+    gl.textAlign = "left";
+    gl.fillText(eti(punti[0][0]), 6, Math.min(A - 4, Math.max(12, yDa + 14)));
+    gl.textAlign = "right";
+    gl.fillText(eti(punti[punti.length - 1][0]), L - 6, Math.min(A - 4, Math.max(12, yA - 6)));
   }
 
   /* ---- il gioco: la scena unica, gli interruttori, il verdetto ---- */
